@@ -1,0 +1,90 @@
+cell_type,source
+markdown,"**EDA ON HEALTHCARE DATASET**
+"
+markdown,"**About the Dataset:** This healthcare dataset is taken from the kaggel platform. Each column provides specific information about the patient, their admission, and the healthcare services provided, making this dataset suitable for various data analysis and modeling tasks in the healthcare domain."
+markdown,"**Importing Libraries**
+"
+code,"import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt"
+markdown,**Loading Data**
+code,"df = pd.read_csv(""/kaggle/input/healthcare-dataset/healthcare_dataset.csv"")
+df"
+code,df.head()
+markdown,**Data Cleaning**
+code,df.info()
+code,pd.isnull(df)
+code,df.shape
+code,df.dropna(inplace = True)
+code,df.shape #there are no null values
+code,pd.isnull(df).sum()
+code,df.columns
+code,df.describe()
+markdown,**What are the different Medical Conditions**
+code,"df[""Medical Condition""].unique()"
+markdown,**Count of the Patient admitted due to various medical conditions and the admission type**
+code,"df[[""Medical Condition"",""Admission Type""]].describe()"
+code,"condition_admission_counts = df.groupby(['Medical Condition', 'Admission Type']).size().unstack(fill_value=0)
+
+condition_admission_counts.plot(kind='bar', stacked=True, figsize=(8, 4))
+
+plt.xlabel('Medical Condition')
+plt.ylabel('Count')
+plt.title('Medical Condition vs. Admission Type')
+
+plt.xticks(rotation=45, ha='right')
+plt.legend(title='Admission Type')
+
+plt.show()"
+markdown,**What are the average billing amounts for each medical condition**
+code,"df[[""Medical Condition"",""Billing Amount""]].info"
+code,"Mean_billing_amount = df.groupby('Medical Condition')[""Billing Amount""].mean()
+Mean_billing_amount"
+code,"total_billing_by_condition = df.groupby('Medical Condition')['Billing Amount'].mean().reset_index()
+
+plt.figure(figsize=(8, 6))
+plt.bar(total_billing_by_condition['Medical Condition'], total_billing_by_condition['Billing Amount'], color='skyblue')
+
+plt.xlabel('Medical Condition')
+plt.ylabel('Total Billing Amount')
+plt.title('Average Billing Amount by Medical Condition')
+
+plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better readability
+
+plt.show()"
+markdown,**Average Days it takes For Recovery for each medical condition**
+code,"df['Date of Admission'] = pd.to_datetime(df['Date of Admission']) #converting the dtype
+df['Discharge Date'] = pd.to_datetime(df['Discharge Date'])"
+code,df.info()
+markdown,**Recovery Days**
+code,"df['Recovery_Days'] = (df['Discharge Date'] - df['Date of Admission']).dt.days
+df['Recovery_Days']"
+code,"mean_recovery = df.groupby('Medical Condition')['Recovery_Days'].mean()
+mean_recovery"
+markdown,**Records for the patient with medical condition Diabetes**
+code,"diabetes_data = df[df['Medical Condition'] == 'Diabetes']
+diabetes_data"
+code,"diabetes_data = df[df['Medical Condition'] == 'Diabetes']
+plt.figure(figsize=(5,4))
+plt.plot(diabetes_data['Medical Condition'], diabetes_data['Age'], color = 'red') 
+plt.show()"
+markdown,Diabetes can be found in any age group of the people.
+markdown,**What is the distribution of meddication based on medical condition**
+code,"medication = df.groupby(['Medical Condition', 'Medication']).size().unstack()
+
+medication.plot(kind='bar', stacked=True, figsize=(10, 6))
+
+plt.xlabel('Medical Condition')
+plt.ylabel('Count')
+plt.title('Distribution of Medication by Medical Condition')
+
+plt.show()"
+markdown,"According to the above chart, pencillin is the most commonly used medication in all medical conditions."
+markdown,**Comparison of hospital visits by gender **
+code,"Gender=df['Gender'].value_counts()
+Gender.plot(kind='bar',color='blue', figsize=(5,5))
+plt.xlabel('Gender')
+plt.ylabel('Count')
+plt.title('Comparision between female and male visited hospital')
+plt.show()"
+markdown,More women than men are seeking medical attention in hospitals as a result of various health issues.
